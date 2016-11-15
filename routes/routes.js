@@ -148,8 +148,14 @@ module.exports = function(app) {
       function timeCalc(time){
         var minutes = time * 60 + 30 //added 30 min to account for slower speeds during takeoff and landing
         var hour = 0, min, duration;
+<<<<<<< 7eedeb26ddd910c7bc5e828f4afe204fdd69d105
           while(minutes > 60) {
             minutes -= 60;
+=======
+        const timeStats = [time];
+          while(time > 60) {
+            time -= 60;
+
             hour+=1;
             min = Math.round(minutes);
           }
@@ -160,12 +166,14 @@ module.exports = function(app) {
           } else {
             duration = min + ' min';
           }
-          return duration;
+          timeStats.push(duration);
+          return timeStats
         }
 
-      let planeStats = {
-        duration: timeCalc(time), //hrs and minutes
-        time: time,
+
+      const planeStats = {
+        duration: time(planeDist)[0],
+        durationText: time(planeDist)[1], //hrs and minutes
         emissions: Math.round(planeDist * planeInfo.planeEmissions.perMile*100)/100
         //lbs of CO2
       }
@@ -208,6 +216,14 @@ module.exports = function(app) {
             med: filteredJStatPrices.mean(),
             high: filteredJStatPrices.max()
           }
+          //this object contains all the important values
+          const returnObj = {
+            planeCost: priceObj.low,
+            planeEmissions: planeStats.emissions,
+            planeTime:planeStats.duration/60,
+            planeTimeText:planeStats.durationText
+          }
+          console.log('==================',returnObj)
           res.status(200).send({price: priceObj.low, type: 'average'})
         })
       } else {
